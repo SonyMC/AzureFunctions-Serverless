@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Go Serverless - AWS Lambda and Azure Functions </title>
+
+	<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+	<meta name="author" content="Hakim El Hattab">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/white.css" id="theme">
+	<link rel="stylesheet" href="css/reveal-override.css" />
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/zenburn.css">
+
+	<!-- Printing and PDF exports -->
+	<script>
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		document.getElementsByTagName('head')[0].appendChild(link);
+	</script>
+
+	<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+</head>
+
+<body>
+
+	<div class="reveal">
+
+		<!-- Any section element inside of this container is displayed as a slide -->
+		<div class="slides">
+
+
+			<!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+			<section data-markdown data-separator="---">
+
+				<script type="text/template">
+<!-- .slide: class="center" -->
+# Go Serverless
+# in AWS & Azure
+---
+## AWS Serverless Architecture
+![](./images/aws/05-serverless-course/aws-serverless-full-stack.png)
+---
+## Azure Serverless Architecture
+![](./images/aws/05-serverless-course/azure-serverless-full-stack.png)
+
+---
+## Before the Cloud
+![](./images/load-variations.png) 
+- Consider a Online Shopping Application: 
+	- Peak usage during holidays and weekends. Less load during rest of the time.
+- A startup suddenly becomes popular:
+	- How does it handle the **sudden increase** in load?
+- Enterprises **procured** (bought) infrastructure **for peak load**
+	- Startups procured infrastructure assuming they would be successful
+---
+## Before the Cloud - Challenges
+![](./images/load-variations.png)
+- Low infrastructure utilization
+- Needs ahead of time planning (**Can you guess the future?**)
+- High costs of procuring infrastructure
+- Dedicated infrastructure maintenance team (**Can a startup afford it?**)
+
+---
+<!-- .slide: class="one30 image-right image-twenty" -->
+## Silver Lining in the Cloud
+![](./images/cloud.png) 
+- How about **provisioning (renting) resources** when you want them and releasing them back when you do not need them? 
+	- **On-demand resource provisioning**
+- Advantages
+	- Lower costs (Pay per use)
+	- No upfront planning needed
+	- Avoid **"undifferentiated heavy lifting"**
+- Challenge
+	- Building cloud enabled applications
+
+---
+## Amazon Web Services (AWS) 
+<!-- .slide: class="one30 image-right image-twenty" -->
+![](./images/aws/aws.png)
+- Leading cloud service provider
+- Provides most (200+) services
+- Reliable, secure and cost-effective
+
+---
+## Serverless
+![](./images/aws/00-icons/lambda.png) 
+![](./images/aws/00-icons/apigateway.png) 
+![](./images/aws/00-icons/dynamodb.png) 
+- What are the things we think about when we develop an application?
+	- Where do we deploy the application?
+	- What kind of server? What OS?
+	- How do we take care of scaling the application?
+	- How do we ensure that it is always available?
+- **What if we do not need to worry about servers and focus on building our application?**
+- Enter **Serverless**
+
+---
+## Serverless
+- Remember: **Serverless does NOT mean "No Servers"**
+- **Serverless for me**:
+	- You don't worry about infrastructure
+	- Flexible scaling
+	- Automated high availability
+	- Pay for use:
+		- You don't have to provision servers or capacity!
+- **You focus on code** and the cloud managed service takes care of all that is needed to scale your code to serve millions of requests!
+
+---
+## AWS Lambda
+![](./images/aws/00-icons/lambda.png) 
+![](./images/aws/00-icons/lambdafunction.png) 
+- Write and Scale Your Business Logic
+	- Write your business logic in Node.js (JavaScript), Java, Python, Go,  C# and more..
+	- Don't worry about servers or scaling or availability (only worry about your code)
+- Pay for Use
+	- Number of requests
+	- Duration of requests
+	- Memory
+
+---
+## Lambda Function Concurrency
+<!-- .slide: class="image-right image-ten" -->
+![](./images/aws/00-icons/lambda.png) 
+- **Function concurrency** - no of Lambda function instances serving requests (at a given time)
+- You invoke a lambda function for the first time:
+	- AWS Lambda creates an instance of the function
+	- AWS Lambda runs the function's handler method and returns  the response
+	- (However) The function instance stays active and waits to process new events
+- You invoke the lambda fn again (while first event is in progress):
+	- AWS Lambda creates another instance of the function
+- When no of requests decreases, Lambda stops unused instances
+- (However) There are limits to concurrency of lambda function (DEMO)
+- Provisioned concurrency can help to avoid fluctuations in latency (DEMO)
+
+---
+## REST API Challenges
+![](./images/aws/00-icons/user.png)
+![](./images/arrow.png) 
+![](./images/aws/00-icons/apigateway.png)
+![](./images/arrow.png) 
+![](./images/aws/00-icons/lambdafunction.png) 
+
+- Most applications today are built around REST API:
+	- Resources (/todos, /todos/{id}, etc.)
+	- Actions - HTTP Methods - GET, PUT, POST, DELETE etc.
+- Management of REST API is not easy:
+	- You've to take care of authentication and authorization
+	- You've to be able to set limits (rate limiting, quotas) for your API consumers
+	- You've to take care of implementing multiple versions of your API
+	- You would want to implement monitoring, caching and a lot of other features..
+
+---
+## Amazon API Gateway
+![](./images/aws/00-icons/user.png)
+![](./images/arrow.png) 
+![](./images/aws/00-icons/apigateway.png)
+![](./images/arrow.png) 
+![](./images/aws/00-icons/lambdafunction.png) 
+- How about a **fully managed service** with auto scaling that can act as a **"front door"** to your APIs?
+- Welcome **"Amazon API Gateway"**
+
+---
+## Amazon API Gateway
+![](./images/aws/00-icons/user.png)
+![](./images/arrow.png) 
+![](./images/aws/00-icons/apigateway.png)
+![](./images/arrow.png) 
+![](./images/aws/00-icons/lambdafunction.png) 
+
+- **"publish, maintain, monitor, and secure APIs at any scale"**
+- Integrates with AWS Lambda or any web application
+- Supports HTTP(S) and WebSockets (two way communication - chat apps and streaming dashboards)
+- Serverless. **Pay for use** (API calls and connection duration)
+
+---
+## API Gateway - API Types
+<!-- .slide: class="one30 image-right image-twenty" -->
+![](./images/aws/00-icons/apigateway.png) 
+- **REST API** 
+	- feature-rich RESTful API
+- **HTTP API**
+	- Also used to build RESTful API
+	- Newer approach
+- **WebSocket API**
+	- Persistent connections with clients 
+	- Allows full-duplex communication
+- Names are little confusing
+
+---
+## API Gateway RESTful API approaches
+<!-- .slide: class="ninety" -->
+
+![](./images/aws/00-icons/apigateway.png) 
+![](./images/arrow.png) 
+![](./images/aws/00-icons/lambdafunction.png) 
+
+##### REST API
+- Fully Featured (API caching, Request/Response Validations, Test invocations)
+- Custom Request/Response Transformations
+- Better Integration with AWS Services (AWS X-Ray, AWS WAF etc)
+
+##### HTTP API
+- Newer, Simpler, Cheaper and Low Latency
+- Automatic Deployments
+
+---
+## REST API Gateway - Custom Integration (Default)
+<!-- .slide: class="image-right image-fifty" -->
+![](./images/aws/05-serverless-course/api-gateway-custom-integration.png)
+- Integrations define request/response transformation to/from lambda
+- The default is Custom Integration
+- Request can be transformed by configuring Mapping Template in Integration Request
+- Response can be transformed by configuring Mapping Template in Integration Response
+
+---
+## REST API Gateway - Proxy Integration
+![](./images/aws/05-serverless-course/api-gateway-proxy-integration.png)
+- How about defining a standard transformation?
+
+---
+## REST API Gateway - Proxy Integration - Request
+
+##### Request to API Gateway
+```
+//Headers: header1:header-value
+//queryString: ?queryparam=queryparamvalue
+{
+	"message": "Welcome"
+}
+```
+
+##### Standard event sent to Lambda Function
+```
+{
+	resource: '/todos',
+	path: '/todos',
+	httpMethod: 'POST',
+	headers: {"header1":"header-value"},
+	multiValueHeaders: {"header1":["header-value"]},
+	queryStringParameters: {"queryparam":"queryparamvalue"},
+	multiValueQueryStringParameters: {"queryparam":["queryparamvalue"]},
+	pathParameters: null,
+	stageVariables: null,
+	requestContext: {},
+	body: '{\n  "message" : "Welcome"\n}',
+	isBase64Encoded: false
+}
+```
+---
+## REST API Gateway Proxy Integration - Response
+
+##### Response from Lambda Function
+```
+{
+    statusCode: 200,                     // a valid HTTP status code
+    headers: { 
+        custom-header: "xyz"             // any API-specific custom header
+    },
+    body: "{\"message\": \"Welcome\"}"   // a JSON string.
+}
+```
+
+##### Response from API Gateway
+![](./images/aws/05-serverless-course/api-gateway-proxy-integration-response.png)
+
+---
+## HTTP API - API Gateway
+<!-- .slide: class="image-right image-twenty" -->
+![](./images/aws/00-icons/apigateway.png) 
+
+- REST API - API Gateway has a lot of features very few AWS customers made use of 
+- REST API - API Gateway is a little complex to setup (transformations etc)
+- How about creating a simpler API Gateway?
+- Enter "HTTP API"
+	- The naming is confusing
+	- Newer, Cheaper and Low Latency
+	- Simpler
+		- Lesser features
+		- Easier to setup
+		- Example: Makes OAuth Authentication simple
+
+---
+## HTTP API - API Gateway - Payload
+<!-- .slide: class="image-right image-twenty" -->
+![](./images/aws/00-icons/apigateway.png) 
+- Two Versions - 1.0 and 2.0
+- (Recommendation) Use 1.0 for migration from REST API and 2.0 for newer APIs
+- Request Structure
+	- Almost same as REST API - Proxy Integration
+	- 2.0 offers support for cookies and has minor changes
+- Response Structure
+	- Same as REST API - Proxy Integration (with `statusCode`,`body`, `headers`)
+	- In addition, 2.0 supports a simple structure:
+		- Just return a valid response JSON  `return {"message": "Welcome"}`
+
+---
+## Amazon Cognito
+<!-- .slide: class="image-right image-twenty" -->
+![](./images/aws/00-icons/cognito.png) 
+- Want to quickly add a sign-up page and authentication for your mobile and web apps?
+- Want to integrate with web identity providers (example: Google, Facebook, Amazon) and provide a social sign-in?
+- Do you want security features such as multi-factor authentication (MFA), phone and email verification?
+- Want to create your own user database without worrying about scaling or operations?
+- Let's go : Amazon Cognito
+
+---
+## Amazon Cognito - User Pools
+<!-- .slide: class="image-right image-twenty" -->
+![](./images/aws/00-icons/cognito.png) 
+- Do you want to create your own secure and scalable user directory?
+- Do you want to create sign-up pages?
+- Do you want a built-in, customizable web UI to sign in users (with option to social sign-in )?
+- Create a user pool
+
+---
+## Amazon Cognito - Identity pools
+![](./images/aws/cognito-identity-pools.png)
+- Identity pools provide AWS credentials to grant your users access to other AWS services
+- Connect identity pools with authentication (identity) providers 
+	- Your own user pool OR
+	- Amazon, Apple, Facebook, Google+, Twitter OR
+	- OpenID Connect provider OR
+	- SAML identity providers (SAML 2.0)
+- Configure multiple authentication (identity) providers for each identity pool
+- Federated Identity 
+	- An external authentication (identity) provider
+	- ex: Amazon, Apple, Facebook, OpenID or SAML identity providers
+
+---
+## Amazon DynamoDB 
+<!-- .slide: class="image-right image-twenty" -->
+![](./images/aws/00-icons/dynamodb.png) 
+- Fast, scalable, distributed for any scale
+- Flexible NoSQL Key-value & document database (schemaless) 
+- Single-digit millisecond responses for million of TPS
+- Do not worry about scaling, availability or durability
+	- Automatically partitions data as it grows
+	- Maintains 3 replicas within the same region
+- No need to provision a database 
+	- Create a table and configure read and write capacity (RCU and WCU)
+	- Automatically scales to meet your RCU and WCU
+- Provides an expensive serverless mode
+- Use cases: User profiles, shopping carts, high volume read write applications
+
+
+---
+## DynamoDB Tables
+<!-- .slide: class="image-right image-thirty" -->
+![](./images/aws/document-database-example.png)
+- Hierarchy : Table > item(s) > attribute (key value pair)
+- Mandatory primary key
+- Other than the primary key, tables are schemaless
+	- No need to define the other attributes or types
+	- Each item in a table can have distinct attributes
+- Max 400 KB per item in table
+	- Use S3 for large objects and DynamoDB for smaller objects
+
+---
+
+## Simple Queuing Service
+<!-- .slide: class="image-right image-fifty" -->
+![](./images/aws/02-Queuing/2-sqs.png)
+- Reliable, scalable, fully-managed message queuing service
+- High availability
+- Unlimited scaling
+	- Auto scale to process billions of messages per day
+- Low cost (Pay for use)
+
+---
+## Standard and FIFO Queues
+<!-- .slide: class="image-right image-twenty" -->
+![](./images/aws/00-icons/sqs.png)
+
+- Standard Queue 
+	- Unlimited throughput
+	- BUT NO guarantee of ordering (Best-Effort Ordering) 
+	- and NO guarantee of exactly-once processing
+		- Guarantees at-least-once delivery (some messages can be processed twice)
+- FIFO (first-in-first-out) Queue
+	- First-In-First-out Delivery
+	- Exactly-Once Processing
+	- BUT throughput is lower 
+		- Upto 300 messages per second (300 send, receive, or delete operations per second)
+		- If you batch 10 messages per operation (maximum), up to 3,000 messages per second 
+- Choose
+	- Standard SQS queue if throughput is important
+	- FIFO Queue if order of events is important
+
+---
+## Sending and receiving a SQS Message - Best case scenario
+<!-- .slide: class="image-right image-thirty" -->
+![](./images/aws/02-Queuing/sqs-simple-flow.png)
+- Producer places message on queue 
+	- Receives globally unique message ID ABCDEFGHIJ (used to track the message)
+- Consumer polls for messages 
+	- Receives the message ABCDEFGHIJ along with a receipt handle XYZ
+- Message remains in the queue while the consumer processes the message
+	- Other consumers will not receive ABCDEFGHIJ even if they poll for messages
+- Consumer processes the message successfully 
+	- Calls delete message (using receipt handle XYZ)
+	- Message is removed from the queue
+
+---
+## Amazon Simple Notification Service(SNS)
+<!-- .slide: class="image-right image-forty" -->
+![](./images/aws/02-Queuing/3-SNS.png)
+- Publish-Subscribe (pub-sub) paradigm
+- Broadcast asynchronous event notifications
+- Simple process
+	- Create an SNS Topic
+	- Subscribers can register for a Topic
+	- When an SNS Topic receives an event notification (from publisher), it is broadcast to all Subscribers
+- Use Cases : Monitoring Apps, workflow systems, mobile apps
+
+---
+## Amazon Simple Notification Service(SNS)
+<!-- .slide: class="image-right image-twenty" -->
+![](./images/aws/00-icons/sns.png)
+
+- Provides mobile and enterprise messaging web services
+	- Push notifications to Apple, Android, FireOS, Windows devices
+	- Send SMS to mobile users
+	- Send Emails
+- REMEMBER : SNS does not need SQS or a Queue
+- You can allow access to other AWS accounts using AWS SNS generated policy
+
+---
+## Serverless Application Model
+- 1000s of Lambda functions to manage, versioning, deployment etc 
+- Serverless projects can become a maintenance headache
+- How to ensure that your serverless projects are adhering to best practices?
+	- Tracing (X-Ray) etc
+- Welcome SAM - Serverless Application Model
+	- Open source framework for building serverless applications
+	- Define a YAML with all the serverless resources you want:
+		- Functions, APIs, Databases etc
+	- BEHIND THE SCENES : Your configuration is used to create a AWS CloudFormation syntax to deploy your application
+
+---
+## Serverless Application Model - References
+|Reference|Link|
+|:--|--|
+|Developer Guide|https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html|
+|AWS SAM Reference|https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-reference.html|
+|AWS SAM Resource and Property Reference|https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-resources-and-properties.html|
+
+---
+## Serverless Framework
+- 1000s of Lambda functions to manage, versioning, deployment etc 
+- Serverless projects can become a maintenance headache
+- Welcome Serverless Framework
+	- Zero-friction serverless development
+	- Easy YAML + CLI development 
+	- Easy deployment to AWS, Azure, Google Cloud, etc
+	- You can use a hosted dashboard (instead of CLI)
+
+---
+## Serverless Framework References
+|Reference|Link|
+|:--|--|
+|Documentation|https://www.serverless.com/framework/docs/|
+|Workflow Tips|https://www.serverless.com/framework/docs/providers/aws/guide/workflow/|
+|Exploring Invoke Local|https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/|
+|serverless.yml template for AWS|https://www.serverless.com/framework/docs/providers/aws/guide/serverless.yml/|
+---
+## Full Stack Architecuture
+<!-- .slide: class="image-right image-forty" -->
+![](./images/aws/05-serverless-course/full-stack-angular-app-architecture.png)
+- Architecuture
+	- Frontend - Angular
+	- Backend - REST API - Serverless or otherwise
+- Setup
+	- Node Js (npm)
+	- Visual Studio Code 
+	- Angular CLI
+---
+## Azure Serverless Architecture
+![](./images/aws/05-serverless-course/azure-serverless-full-stack.png)
+
+---
+<!-- .slide: class="center" -->
+# You are all set!
+---
+<!-- .slide: class="one50" -->
+## Let's clap for you!
+- You have a lot of patience! Congratulations
+- You have put your best foot forward to get started with Serverless
+- Keep Learning and
+- Good Luck!
+
+---
+<!-- .slide: class="one50" -->
+## Do Not Forget!
+- Recommend the course to your friends!
+	- Do not forget to review!
+- Your Success = My Success
+	- Share your success story with me on LinkedIn (Ranga Karanam)
+	- Share your success story and lessons learnt in Q&A with other learners!
+                    </script>
+			</section>
+
+		</div>
+
+	</div>
+
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
+
+
+	<script>
+
+		// More info https://github.com/hakimel/reveal.js#configuration
+		Reveal.initialize({
+			// The "normal" size of the presentation, aspect ratio will be preserved
+			// when the presentation is scaled to fit different resolutions
+			width: 1200,
+			height: 700,
+
+			// Factor of the display size that should remain empty around the content
+			margin: 0.04,
+
+			// Bounds for smallest/largest possible scale to apply to content
+			minScale: 0.2,
+			maxScale: 2.0,
+
+			controls: false,
+			progress: false,
+			history: true,
+			center: false,
+			slideNumber: true,
+			//fragments: false,
+			transition: 'none', // none/fade/slide/convex/concave/zoom
+
+			// More info https://github.com/hakimel/reveal.js#dependencies
+			dependencies: [
+				{ src: 'lib/js/classList.js', condition: function () { return !document.body.classList; } },
+				{ src: 'plugin/markdown/marked.js', condition: function () { return !!document.querySelector('[data-markdown]'); } },
+				{ src: 'plugin/markdown/markdown.js', condition: function () { return !!document.querySelector('[data-markdown]'); } },
+				{ src: 'plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
+				{ src: 'plugin/zoom-js/zoom.js', async: true },
+				{ src: 'plugin/notes/notes.js', async: true }
+			]
+		});
+
+
+	</script>
+
+</body>
+
+</html>

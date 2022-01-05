@@ -1,0 +1,656 @@
+Function Apps:
+------------------
+	- In a single function app you can have multiple functions 
+	- Works in a serverless environment
+	- Create Function App:
+		- Azure -> Search for Function Apps -> Function Apps ->Create
+		- Subscription= select your sub
+		- Resource Group -> Create New -> Name = Serverless-Hello-World
+		- Function App name= hello-world-serverless-mailsonymathew
+		- Publish= code
+		- Runtime stack = Node.js
+		- Version = 12 lTS
+		- Region = Central US
+		- Review & Create -> Create
+	- Create function :	
+		- Resource Group = Serverless-Hello-World -> our app -> hello-world-serverless-mailsonymathew
+		- Functions( on LHS tab) -> Create
+			- Select on how the serverless function is going to be triggered:
+				- Devlopment environment: Develop in portal
+				- Choose HTTP trigger for demo:		
+					- Details -> New Function = hello-world
+					- Authorization level = function
+					- Create Function
+			 -Code+ Test the function:
+				- Click on CODE + Test on LHS -> Wil lshow code body of index.js
+					-> Click on Test/Runicon on top of code body:
+						-> HTTP method = POST
+						-> Key= master(Host key) 
+						-> Leave Query , Headers , Body as default 
+						- > RUN
+						-> Response code 200
+				- Check logs on bottom
+
+				-  Click on CODE + Test on LHS -> Wil lshow code body of index.js
+					-Code body:
+						- line no. 1 : module.exports = async function( context,req)
+								- Two parms passed in where context is the execution context liek env etc and Request contains details about resuest like query parm, body  and header
+						-> Click on Test/Run icon on top of code body:
+							- Input -> Query -> Ad dparmater -> Name=name, Value= Sony
+							- Run
+						-> Output will contain Sony
+						-> Click on Test/Run icon on top of code body:
+							- Input ->Body-> "name":Sony
+			 
+							- Run
+						-> Output will contain Sony
+
+				- Expose function as REST API-> Click on 'Get Function URL' -> copy url -> paste it in browser
+					- At end of url afer '==' add '&name=Sony'
+
+			-  Click on CODE + Test on LHS -> Wil lshow code body of index.js
+					-Code body:
+						- change to return context instead of responseMEassage:
+							context.res= {
+							body: JSOn.stringify(context) 
+							};
+						- Expose function as REST API-> Click on 'Get Function URL' -> copy url -> paste it in browser	
+						- Will show context details
+
+						- change to return request:
+							context.res= {
+							body: JSOn.stringify(req) 
+							};
+						- Expose function as REST API-> Click on 'Get Function URL' -> copy url -> paste it in browser	
+						- Will show request details
+
+			- function.json : Click on dropdwon above code body to select function.js instead of index.js
+					- Thsi will contain all input and output bindings( direction = in for input and direction=out fro output)
+					- Input binding handles incoming request an d Outcoming binding handles response
+					- Function keys:In input you can see auth level set as function. In teh request url you can see a function key automatically supplied( startrs with code=)
+						- The value of teh function key is supplied from the section 'Function Keys':
+							- Click 'Function Keys' on LHS tab -> 
+								- Name= default
+								- Value= click on eye icon to see function key value	
+								- You cann add new values or geernate a new values
+					 - Request name= "req"
+					 - Methods supportes : POST,GET
+					- In output binding you can use "name": "$return" instead of "res" 	
+			- index.js:
+					- Intead of 'context.res =' use 'return'
+
+			- If we do not want any authentication:
+				- function.js:
+					- change input binding:
+						- "authLevel": "anonymous" ( from "function")
+			- Remove function code from url and it will work
+
+
+
+Building Azure funcctions in Visual Studio
+--------------------------------------------
+-D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+- code reference: https://github.com/in28minutes/go-serverless/tree/master/01.azure/azure-rest-api/listTodos
+		:https://github.com/in28minutes/go-serverless/blob/master/01.azure/azure-rest-api/azure.md
+
+- Install Node js(npm) :	
+	-https://nodejs.org/en/download/
+	-After istallation , check version:
+		- cmd: npm version
+- Connect to zure functions from Visual Studio 
+		- Open Visual studio 
+		- Extensions -> Azure functions-> Enable
+		- Azure extension icon should be visible on LHS tab of VS
+			- Click on it ->Functions sign in to Azure-> Click on icon within Functions to create newproject
+				 -> Select folder:Open folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+				 -> Select Language: Java Script
+				 -> Template = skip for now 
+- Seelct explorer icon in VS:
+	- OPen folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api	   
+
+
+- Create Azure Serverless Function App from VS:
+	- Go to Azure function in VS:
+		- Click on Create Function icon :
+			- Select template: HTTP trigger
+	- 		- Function Name: listToDos -> Press Enter
+				- Authorization=Anonymous
+
+- Select Expolorer:
+	- New folder named 'listToDos has benn created with 3 files : 
+			- 1) function.json : Will contain input and output bindings
+			- 2) index.js : Will contain code for finction
+			- 3) sample.dat : is any sampe reuest body that can be used to execute teh function
+
+- Running Azure Serverless in Local:
+	- Install Azure CLI: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli  
+		- Verify- > open cmd:
+			- cmd: az --version	
+	- Install Azure function core tools: https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Cwindows%2Ccsharp%2Cportal%2Cbash%2Ckeda		
+		-Verify -> open cmd:
+			- cmd:func --version
+
+	- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+				- copy listToDos url from console: [GET,POST] http://localhost:7071/api/listToDos
+				- pass a name parameter: http://localhost:7071/api/listToDos?name=Tigers!!!
+	- Customizing response and bindings for ListToDos:
+		- Explorer:
+			- index.js:
+    //context.res = {
+    return{    
+        // status: 200, /* Defaults to 200 */
+        body: 'Keep roaring!!!'
+    };
+
+			- function.json:
+			    {
+      "type": "http",
+      "direction": "out",
+      "name": "$return"
+    }
+
+			
+		
+	- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+				- copy listToDos url from console: [GET,POST] http://localhost:7071/api/listToDos
+					- http://localhost:7071/api/listToDos
+	 	
+	 -Explorer-> function.json:
+		-  "bindings": [
+    {
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "get"
+      ],
+      "route": "todos"  //specify a route
+    },
+	
+	- base don the 'route' specified, the url now will be: http://localhost:7071/api/todos 		
+	- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+				- copy listToDos url from console: [GET,POST] http://localhost:7071/api/listToDos
+					- chang eit as follows: http://localhost:7071/api/todos 
+
+Cosmos Mongo DB
+-------------------------
+
+- Create COSMOS DB Account:
+	- Azure COSMOS DB :
+		- Is used as data store which can be used o configure an instance of Mongo DB 
+		- Mongo DB is  a document DB which is similar to AWS Dynamo DB
+		- Add -> 
+			: Select API option: Azure Cosmos DB API for MongoDB
+			: Resource Group -> Create new -> cosmosdb-todos-mailsonymathew
+			: Account name= cosmosdb-todos-mailsonymathew
+			:API= Azure Cosmos DB for MongoDB API
+			:Cpacaity mode: Provisioned throughput
+			: Apply free tier dicount: Apply
+			:Limit total account throughput: Enable
+			:Location:(US) East US
+			:Account Type= Non Production
+			:Version= any version 
+			:Global Distribution:
+				:Geo-redundancy= Disable
+				:Multi-region Writes = Disable
+				: Availability zones = Disable
+			: Networking:
+				: Connectivity method: Al lnetworks
+			: Backup Policy:
+				- Choose defaults
+				- Backup Storage redundancy = Locally redundant backup storage
+			: Encryption:
+				- Service-managed key 
+			: Tags: 
+				- leave blank
+			: Review and create
+		- Create
+
+	- Creation time = around 5 minutes
+
+- Create COSMOS DB and Collections:
+
+	- cosmosdb-todos -> 
+		- Choose a platform = Select Node.js
+			 - Connection details: Mongo DB connection details can be seen. 
+		 
+		- Overview -> Add Collection:
+			- Collection is very similar to a table
+			- In a Document database a collection contians no. of documents
+			- Each document corresponds to a row of data 	
+			- Hierarchy:
+				- Account -> Database -> Collections -> Documents
+			- Database id -> Create new -> Databse id= serverless
+				- Database throughput: Manual
+				- Throughput(400 - 1,000,000 RU/s= 400
+			- Collection nam =todos
+			- Sharding: Sharded
+			- 
+			- Shard key= _id
+				- must start with '_'
+				- Shard is very important
+				- Database will hav emultipl collections.Each collection will contain multile docs or rows
+				- So here is each doument in that collection , mongodb will automatically create an 'id' field
+				- 'id' is automatially geenrated
+				- Is used to automatically partition data among multiple servers for scalability
+				- Unique identier		
+				- Document DB is primarily used for scalability
+				-Advanced:
+					- Create a Wildcard index on all fields: Enable
+	- cosmosdb-todos-> Data Explorer:
+			- You should see:
+				- Data:
+					- serverless:
+						- Scale
+						- todos
+							- documents
+							- settings
+			- serverless-> Scale-> todos->documents:
+				- New Document	-> Click on 'New Document' icon on top 
+				- insert data using following jsons and save after each json document
+
+			
+	- 
+	
+						
+-Todo 1
+
+  {
+      "username":"mailsonymathew",
+      "description":"Keep roaring",
+      "targetDate":"2030-07-15T05:46:47.649+0000",
+      "done":false
+   }
+
+
+Todo 2
+
+   {
+      "username":"mailsonymathew",
+      "description":"Become a legend",
+      "targetDate":"2030-07-15T05:47:05.906+0000",
+      "done":false
+   }
+
+
+
+
+
+- Refresh documents -> you can see document with automatically geenrated id
+
+- Connecting local listToDos function with MongoDB:
+-----------------------------------------------------
+	-  Visual Studio:
+		- D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+		- Install MongoDB library:
+			- New termional: Click on + icon on exisitng terminal forNew terminal :
+				- Since this is a javascript project, we are using npm to manage dependencies
+				-Create new npm project:
+					- cmd: npm init
+						-package name: azure-rest-api
+						-version:(1.0.0)
+						- description:
+						- entry point:(index.js)
+						- test command:
+						- git repository: 
+						- keywords:
+						- author:
+						- license:(ISC)
+						-Is thsi OK?(yes): yes
+					- Create package.json
+						- we can use package.json to manage dependencies for this js project
+						- Add MongoDB as a dependency:
+							- cmd: npm install --save mongodb
+					- package.json will be updated with mongodb dependency
+						- select the line 'mongodb: "4.2.2" in package.json
+		 					- text will pop up showing github location -> https://github.com/mongodb/node-mongodb-native
+									 - go to github location
+									- Gihub-> scroll down teh repo-> see section for sample code 
+					-Change index.js:
+						- Refer https://github.com/in28minutes/go-serverless/blob/master/01.azure/azure-rest-api/listTodos/index.js
+
+						- url to connect: connection string :
+							- cosmosdb-todos-> Connection String -> Primary connection string
+							- *** Note: 
+								- If url is harcoded in =index.js:
+									- if you are using the connection string directly instead of via environemnt variables, you have to repalce all '==' with encoded notaiton  '%3D%3D'
+									- Thsi is because '==' is used a query parameter
+								 - If you set up url( aka connection string) as an environment variable below, you should not replace '=='.
+
+
+
+						- Setting up envirnment variables const URL, DATABSE_NAME and COLLECTION_NAME
+					-  			- Format to be used 'process.env.variable'
+   									 const URL = process.env.MONGODB_URL;
+    									 const DATABASE_NAME = process.env.MONGODB_DATABASE_NAME;//'serverless'
+    									const COLLECTION_NAME = process.env.MONGODB_COLLECTION_NAME;//'todos'
+
+
+								- go to local.settings.json:
+									- thsi file will be available in'D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api'
+									- define the environemtn vraible and values
+										- Inside section "Values":{
+											"MONGODB_URL": "<connection string>",
+											"MONGODB_DATABASE_NAME": "serverless",
+											"MONGODB_COLLECTION_NAME": "todos"
+										}
+	
+
+
+
+
+
+
+											
+											 
+
+		- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+				- copy listToDos url from console: [GET,POST] http://localhost:7071/api/listToDos
+				- http://localhost:7071/api/todos
+				- should return the documents in the MongoDB
+
+
+
+
+
+
+- Create Azure finction for GET Todos:
+-----------------------------------------
+	- Visual Studio-> OPen folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+	- Click on Create Function icon :
+		- Select template: HTTP trigger
+		- Function Name: getToDo -> Press Enter
+		- Authorization=Anonymous
+	- Refer github code inhttps://github.com/in28minutes/go-serverless/tree/master/01.azure/azure-rest-api
+	- Change function.json and index.js accordingly	
+	- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+				- copy getToDo url from console: 
+				-  http://localhost:7071/api/todos/{id}
+				- E.g.: http://localhost:7071/api/todos/61b98f51d6e19c183043cfbd
+				- should return the document for that id in the MongoDB	
+	
+
+
+- Connecting Angular Frontend to Azure Functions:
+-------------------------------------------------
+
+- Backend:Visual Studio-> Main window-> Backend code: OPen folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+- Frontend:Visual Studio-> Second window-> Front code: OPen folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\02.frontend-todo-application
+	- Built in Angular
+	- Refer README.md
+	- Install :
+		- NodeJS(npm) : Refer https://nodejs.org/en/download/
+		- Angular CLI : Refer https://angular.io/cli
+			- cmd: npm install -g @angular/cli
+
+	- Compile & Launch frontend angular application:
+		- cd into D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\02.frontend-todo-application
+		- If the following file is available delete it:
+				:package-lock.json 
+		- Compile project: 	
+			- cmd: npm install
+		- Launch application:
+			- cmd: ng serve
+				- server will start on http://localhost:4200/
+				- select harcoded login in frontend
+				- tods will not conain anything as we have to connect to ourbackend
+				- Clinck on 'delete session token' button on top right corner
+
+	- Specify backend api url in app.constants.ts:
+		- Open Visual Studio and go to app.constants.ts in D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\02.frontend-todo-application\src\app
+			- export const API_URL = 'http://localhost:7071/api/todos'
+
+	- Refresh forontend url 
+		-http://localhost:4200/
+		-Still you will not see any 'todos'
+		-This is because of CORS( Cross Origin Resource Sharing) being diabled
+			- To see the CORSerror: In browser page -> righ tclick -> Inspect -> Console -> you can see error message saying blocked due to CORS policy
+			- Enable CORS:
+				- In VS window 1 -> go to local.settings.json in D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api:
+					- {
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "MONGODB_URL": "mongodb://cosmosdb-todos-mailsonymathew:tUhk7FNhZZq5wjeksp2uCUI6uvoMsA2WP1tOBlLFG7HxtEGyZqyyxOJDzjpKSEeEeLv5kj8exRrWEtxxyPI3YQ==@cosmosdb-todos-mailsonymathew.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@cosmosdb-todos-mailsonymathew@",
+    "MONGODB_DATABASE_NAME": "serverless",
+    "MONGODB_COLLECTION_NAME": "todos"    
+  },
+  "Host": {
+    "CORS": "*" //Enable CORS from everwhere
+  }
+}
+
+
+
+	- 		- Do a CTRL+C and got to termoina window and restart:
+				- cmd: func start
+
+		- Refresh Frontend application http://localhost:4200/:
+			-- Wait for minute
+			- You should be able to see todos
+			- Now we have to create update, deelte and create backend REST APIS
+
+
+- Create Update todo REST API:
+	- Visual Studio-> OPen folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+	- Click on Create Function icon :
+		- Select template: HTTP trigger
+		- Function Name: updateToDo -> Press Enter
+		- Authorization=Anonymous
+	- Refer github code in https://github.com/in28minutes/go-serverless/tree/master/01.azure/azure-rest-api/updateTodo
+	- Change function.json and index.js accordingly	
+	- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+		-
+		- Refresh Frontend application http://localhost:4200/:
+				- Wait for minute
+				- Try updating existing todos
+			
+
+
+- Create Delete todo REST API:
+	- Visual Studio-> OPen folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+	- Click on Create Function icon :
+		- Select template: HTTP trigger
+		- Function Name: deleteToDo -> Press Enter
+		- Authorization=Anonymous
+	- Refer github code in https://github.com/in28minutes/go-serverless/tree/master/01.azure/azure-rest-api/deleteTodo
+	- Change function.json and index.js accordingly	
+	- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+		-
+		- Refresh Frontend application http://localhost:4200/:
+				- Try deelting existing todos
+				- ait for a minute to see results
+			
+
+- Create createtodo REST API:
+	- Visual Studio-> OPen folder D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+	- Click on Create Function icon :
+		- Select template: HTTP trigger
+		- Function Name: createToDo -> Press Enter
+		- Authorization=Anonymous
+	- Refer github code in https://github.com/in28minutes/go-serverless/tree/master/01.azure/azure-rest-api/createTodo
+	- Change function.json and index.js accordingly	
+	- Visual Studio-> Click on Terminal link on teh top bar -> New terminal 
+		- Start function:
+			- cmd: funct start
+		-
+		- Refresh Frontend application http://localhost:4200/:
+				- Try creating todos
+
+
+
+
+****
+Deploy to Azure and gettign started with API management
+-----------------------------------------------------
+
+- D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api
+-Signing in and Signing out of Azure:
+	-VS -> View -> Command Pallette -> Azure: Sign in / Azure: Sign Out   
+-Visual Studio -> Azure icon -> Click on Icon to 'Deploy On Function App'
+	-> Create a new function app
+	-> Enter a globally unique name for our new function app:todo-function-app
+	->Create a new REsounrce Group=todo-rest-api-resounrce-group
+	-> Create a new Storage Account= todorestapistorageacc
+	->Location=Central US
+	
+	-> Creation will take around 5-10 minutes
+	-> View output to see what all was created
+	-> A new function app should be available below your subscription
+- Azure-> function app-> todo-function-app
+
+	- click on functions app to see list of al lfunctions
+		- This is non editable as we have deployed a package. We need to edit using VS and redeploy
+		- Functions->  listTodos-> Get Function Url:
+			- Function url will not work
+			- VS -> D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api-> local.settings.json
+				-local.settings.json: Configure the supplied environment variable in thsi file within the Azure function app configuration :
+					- Azure-> function app-> todo-function-app-> Configuration -> New Application Setiing -> 
+						
+						: Name=MONGODB_URL
+						  Value= mongodb://cosmosdb-todos-mailsonymathew:wIYCMKQQgKpwfXHe3TSjE9KIdJvptXppGRJreyfKbctqqqc5j9vRV9CrRw2kBffx9COvVG4rBnUprsow2WEdDQ==@cosmosdb-todos-mailsonymathew.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@cosmosdb-todos-mailsonymathew@
+						Disable Deployment Slot setting ( thsi can be used when we have multipel deployment slots)
+						:Name=MONGODB_DATABASE_NAME
+						 Value=Serverless
+						Disable Deployment Slot setting ( thsi can be used when we have multipel deployment slots)
+			
+						:Name=MONGODB_COLLECTION_NAME
+						 Value=todos
+					         Disable Deployment Slot setting ( thsi can be used when we have multipel deployment slots)	
+
+					-		- Functions->  listTodos-> Get Function Url
+
+								- check the function url is returing the content in mongodb
+
+				- Now connect the front end to the Azure deployed finction app:
+					- VS-> New window - Open Folder -> D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\02.frontend-todo-application 
+					-app.constants.ts:
+						- export const API_URL:Azure function app url
+						- subscription id: cab51fa7-6e0c-40e0-a5cf-83b1def2d3ca
+					- Compile project: 	
+						- cmd: npm install
+					- Launch application:
+						- cmd: ng serve
+						- server will start on http://localhost:4200/
+					- There will not be any todos returned form the MongoDB:
+						- Inspect-> Console-> Blkocked by CORS policy error
+					- Set CORS policy:
+						- VS-> D:\OneDrive\Study\DevOps\AzureFunctions\go-serverless-master\01.azure\azure-rest-api-> local.settings.json = We have already enabled CORS
+						- Azure ->todo-function-app-> search for CORS -> CORS -> Allowd Origins= *
+					-Wait for a minute and do refresh: http://localhost:4200/
+
+
+
+						
+							
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
